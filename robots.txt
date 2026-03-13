@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://helixoriginator.github.io/algorithmic-sandwich-protocol-biosemiotic-governance/sitemap.xml
