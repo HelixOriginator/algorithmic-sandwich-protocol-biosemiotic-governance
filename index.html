@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>The Algorithmic Sandwich Protocol — Kallol Chakrabarti</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --void: #02020a;
+    --deep: #080818;
+    --layer: #0d0d28;
+    --gold: #c9a84c;
+    --gold-bright: #f0c75a;
+    --gold-dim: #7a5e1e;
+    --saffron: #e8630a;
+    --saffron-dim: #7a3205;
+    --cyan: #0ef7e4;
+    --cyan-dim: #065e57;
+    --text: #e8e4d8;
+    --text-dim: #8a8070;
+    --dharma: #8b3be8;
+    --dharma-dim: #3d1566;
+    --border: rgba(201,168,76,0.18);
+    --glow: 0 0 40px rgba(201,168,76,0.12), 0 0 80px rgba(201,168,76,0.05);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--void);
+    color: var(--text);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+
+  /* ═══════════════════ STAR FIELD ═══════════════════ */
+  #starfield {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background: radial-gradient(ellipse at 20% 30%, rgba(139,59,232,0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 70%, rgba(14,247,228,0.03) 0%, transparent 60%),
+                var(--void);
+  }
+  .star {
+    position: absolute; border-radius: 50%;
+    background: white; animation: twinkle var(--d) ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%,100%{opacity:var(--lo);transform:scale(1)}
+    50%{opacity:var(--hi);transform:scale(1.4)}
+  }
+
+  /* ═══════════════════ LAYOUT ═══════════════════ */
+  .page { position: relative; z-index: 1; }
+
+  /* ═══════════════════ HERO ═══════════════════ */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(201,168,76,0.04) 60px),
+      repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(201,168,76,0.04) 60px);
+    pointer-events: none;
+  }
+
+  .mandala-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid;
+    animation: rotate linear infinite;
+    top: 50%; left: 50%; transform-origin: center;
+  }
+  .mandala-ring:nth-child(1){width:600px;height:600px;margin:-300px 0 0 -300px;border-color:rgba(201,168,76,0.06);animation-duration:120s}
+  .mandala-ring:nth-child(2){width:800px;height:800px;margin:-400px 0 0 -400px;border-color:rgba(14,247,228,0.04);animation-duration:180s;animation-direction:reverse}
+  .mandala-ring:nth-child(3){width:1000px;height:1000px;margin:-500px 0 0 -500px;border-color:rgba(232,99,10,0.03);animation-duration:240s}
+  .mandala-ring:nth-child(4){width:1200px;height:1200px;margin:-600px 0 0 -600px;border-color:rgba(139,59,232,0.03);animation-duration:300s;animation-direction:reverse}
+
+  @keyframes rotate { to { transform: rotate(360deg); } }
+
+  .hero-inner { position: relative; z-index: 2; max-width: 900px; }
+
+  .om-symbol {
+    font-size: 5rem;
+    background: linear-gradient(135deg, var(--gold), var(--saffron));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    display: block;
+    animation: pulse-glow 4s ease-in-out infinite;
+    line-height: 1; margin-bottom: 1.5rem;
+    filter: drop-shadow(0 0 30px rgba(201,168,76,0.4));
+  }
+  @keyframes pulse-glow {
+    0%,100%{filter:drop-shadow(0 0 20px rgba(201,168,76,0.3))}
+    50%{filter:drop-shadow(0 0 50px rgba(232,99,10,0.6))}
+  }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    color: var(--cyan);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0.8;
+  }
+
+  .hero-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(2rem, 6vw, 4.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--gold-bright) 0%, var(--gold) 40%, var(--saffron) 80%, var(--gold-bright) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    animation: shimmer 6s linear infinite;
+    background-size: 200% auto;
+  }
+  @keyframes shimmer { to { background-position: 200% center; } }
+
+  .hero-subtitle {
+    font-size: 1.3rem;
+    font-style: italic;
+    color: var(--text-dim);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.04em;
+  }
+
+  .hero-sanskrit {
+    font-size: 1.6rem;
+    color: var(--gold-dim);
+    letter-spacing: 0.1em;
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-desc {
+    font-size: 1.1rem;
+    line-height: 1.9;
+    color: var(--text-dim);
+    max-width: 700px;
+    margin: 0 auto 3rem;
+    font-weight: 300;
+  }
+
+  .badge-row {
+    display: flex; flex-wrap: wrap; gap: 0.8rem;
+    justify-content: center; margin-bottom: 3rem;
+  }
+  .badge {
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--gold-dim);
+    background: rgba(201,168,76,0.04);
+    text-transform: uppercase;
+  }
+
+  .scroll-cue {
+    position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    opacity: 0.4; animation: bob 2s ease-in-out infinite;
+  }
+  .scroll-cue span { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; letter-spacing: 0.2em; color: var(--gold); }
+  .scroll-line { width: 1px; height: 50px; background: linear-gradient(to bottom, var(--gold), transparent); }
+  @keyframes bob { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(6px)} }
+
+  /* ═══════════════════ SECTIONS ═══════════════════ */
+  section { padding: 6rem 2rem; max-width: 1100px; margin: 0 auto; }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.35em;
+    color: var(--cyan);
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+    opacity: 0.7;
+  }
+
+  .section-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.4rem, 3vw, 2.4rem);
+    color: var(--gold);
+    margin-bottom: 2rem;
+    line-height: 1.2;
+  }
+
+  .divider {
+    width: 100%; height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold-dim), transparent);
+    margin: 4rem 0;
+    opacity: 0.4;
+  }
+
+  /* ═══════════════════ SANDWICH DIAGRAM ═══════════════════ */
+  .sandwich-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    margin: 4rem 0;
+    position: relative;
+  }
+
+  .sandwich-layer {
+    width: 100%; max-width: 720px;
+    padding: 1.6rem 2.5rem;
+    border: 1px solid;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: default;
+  }
+  .sandwich-layer:hover { transform: scale(1.02); }
+
+  .layer-shrim-top, .layer-shrim-bot {
+    background: linear-gradient(135deg, rgba(139,59,232,0.15), rgba(139,59,232,0.08));
+    border-color: rgba(139,59,232,0.5);
+    box-shadow: 0 0 30px rgba(139,59,232,0.1), inset 0 0 20px rgba(139,59,232,0.05);
+  }
+  .layer-ethics-top, .layer-ethics-bot {
+    background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(201,168,76,0.06));
+    border-color: rgba(201,168,76,0.4);
+    box-shadow: 0 0 25px rgba(201,168,76,0.08);
+    max-width: 660px;
+  }
+  .layer-logic {
+    background: linear-gradient(135deg, rgba(14,247,228,0.12), rgba(14,247,228,0.05));
+    border-color: rgba(14,247,228,0.5);
+    box-shadow: 0 0 40px rgba(14,247,228,0.12), inset 0 0 30px rgba(14,247,228,0.04);
+    max-width: 600px;
+    z-index: 2;
+  }
+
+  .layer-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .layer-shrim-top .layer-tag, .layer-shrim-bot .layer-tag { color: var(--dharma); }
+  .layer-ethics-top .layer-tag, .layer-ethics-bot .layer-tag { color: var(--gold); }
+  .layer-logic .layer-tag { color: var(--cyan); }
+
+  .layer-name {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.2rem;
+    margin-bottom: 0.4rem;
+  }
+  .layer-shrim-top .layer-name, .layer-shrim-bot .layer-name { color: var(--dharma); }
+  .layer-ethics-top .layer-name, .layer-ethics-bot .layer-name { color: var(--gold); }
+  .layer-logic .layer-name { color: var(--cyan); }
+
+  .layer-desc {
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    font-style: italic;
+    line-height: 1.7;
+  }
+
+  .layer-sanskrit {
+    position: absolute; right: 1.5rem; top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.8rem;
+    opacity: 0.25;
+  }
+
+  .connector {
+    width: 2px;
+    height: 28px;
+    background: linear-gradient(to bottom, var(--gold-dim), var(--saffron-dim));
+    opacity: 0.5;
+    position: relative;
+  }
+  .connector::after {
+    content: '▼';
+    position: absolute; bottom: -8px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.5rem;
+    color: var(--saffron-dim);
+  }
+
+  /* ═══════════════════ THREE PILLARS ═══════════════════ */
+  .pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2px;
+    margin: 3rem 0;
+  }
+
+  .pillar {
+    padding: 2.5rem;
+    background: var(--layer);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s ease;
+  }
+  .pillar:hover { border-color: var(--gold-dim); }
+  .pillar::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  }
+  .pillar-1::before { background: linear-gradient(to right, var(--dharma), transparent); }
+  .pillar-2::before { background: linear-gradient(to right, var(--cyan), transparent); }
+  .pillar-3::before { background: linear-gradient(to right, var(--saffron), transparent); }
+
+  .pillar-num {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 3rem;
+    font-weight: 900;
+    opacity: 0.06;
+    position: absolute;
+    right: 1.5rem; top: 1rem;
+    line-height: 1;
+  }
+
+  .pillar-icon {
+    font-size: 2rem; margin-bottom: 1rem;
+    display: block;
+  }
+
+  .pillar-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.95rem;
+    color: var(--gold);
+    margin-bottom: 1rem;
+    line-height: 1.4;
+  }
+
+  .pillar-body {
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    line-height: 1.8;
+    font-weight: 300;
+  }
+
+  .pillar-tag-list {
+    display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem;
+  }
+  .pillar-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    padding: 0.2rem 0.6rem;
+    border-radius: 2px;
+    text-transform: uppercase;
+  }
+  .pillar-1 .pillar-tag { background: rgba(139,59,232,0.12); color: var(--dharma); border: 1px solid rgba(139,59,232,0.2); }
+  .pillar-2 .pillar-tag { background: rgba(14,247,228,0.08); color: var(--cyan); border: 1px solid rgba(14,247,228,0.2); }
+  .pillar-3 .pillar-tag { background: rgba(232,99,10,0.1); color: var(--saffron); border: 1px solid rgba(232,99,10,0.25); }
+
+  /* ═══════════════════ PROTOCOL FLOW ═══════════════════ */
+  .flow-container {
+    margin: 3rem 0;
+    position: relative;
+    padding-left: 2.5rem;
+  }
+  .flow-line {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--dharma), var(--cyan), var(--gold), var(--saffron), var(--dharma));
+    opacity: 0.4;
+  }
+
+  .flow-step {
+    display: flex; gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    align-items: flex-start;
+    position: relative;
+  }
+  .flow-step::before {
+    content: '';
+    position: absolute; left: -2.7rem; top: 0.6rem;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    background: var(--void);
+  }
+
+  .flow-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--gold-dim);
+    min-width: 30px;
+    padding-top: 0.2rem;
+    letter-spacing: 0.1em;
+  }
+
+  .flow-content { flex: 1; }
+  .flow-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.9rem;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+  }
+  .flow-body {
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    line-height: 1.8;
+  }
+
+  .flow-code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    background: rgba(14,247,228,0.05);
+    border: 1px solid rgba(14,247,228,0.15);
+    border-left: 3px solid var(--cyan);
+    padding: 0.8rem 1rem;
+    margin-top: 0.8rem;
+    color: var(--cyan);
+    border-radius: 0 4px 4px 0;
+    line-height: 1.6;
+    overflow-x: auto;
+  }
+
+  /* ═══════════════════ EQUATION BLOCK ═══════════════════ */
+  .equation-block {
+    margin: 4rem 0;
+    padding: 3rem;
+    background: linear-gradient(135deg, rgba(201,168,76,0.05), rgba(139,59,232,0.05));
+    border: 1px solid var(--border);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .equation-block::before, .equation-block::after {
+    content: '◈';
+    position: absolute;
+    font-size: 8rem;
+    opacity: 0.02;
+    color: var(--gold);
+  }
+  .equation-block::before { top: -2rem; left: -1rem; }
+  .equation-block::after { bottom: -2rem; right: -1rem; }
+
+  .equation-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+  }
+
+  .equation {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1rem, 2.5vw, 1.6rem);
+    font-style: italic;
+    line-height: 1.8;
+    color: var(--text);
+  }
+  .eq-gold { color: var(--gold); font-style: normal; font-weight: 600; }
+  .eq-cyan { color: var(--cyan); font-style: normal; }
+  .eq-dharma { color: var(--dharma); font-style: normal; }
+  .eq-saffron { color: var(--saffron); font-style: normal; }
+  .eq-op { color: var(--text-dim); padding: 0 0.8rem; }
+
+  /* ═══════════════════ VARGA TABLE ═══════════════════ */
+  .varga-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 2rem 0;
+    font-size: 0.9rem;
+  }
+  .varga-table th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+    text-align: left;
+    background: rgba(201,168,76,0.03);
+  }
+  .varga-table td {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(201,168,76,0.06);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+  .varga-table tr:hover td { background: rgba(201,168,76,0.03); }
+  .vt-sound { color: var(--gold); font-family: 'Cinzel Decorative', serif; font-size: 0.85rem; }
+  .vt-body { color: var(--saffron); font-style: italic; }
+  .vt-civic { color: var(--cyan); }
+  .vt-dharma { color: var(--dharma); font-size: 0.85rem; }
+  .vt-status {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: 2px;
+  }
+  .status-active { background: rgba(14,247,228,0.1); color: var(--cyan); border: 1px solid rgba(14,247,228,0.2); }
+  .status-critical { background: rgba(232,99,10,0.1); color: var(--saffron); border: 1px solid rgba(232,99,10,0.25); }
+  .status-stable { background: rgba(139,59,232,0.1); color: var(--dharma); border: 1px solid rgba(139,59,232,0.2); }
+
+  /* ═══════════════════ QUOTE PULL ═══════════════════ */
+  .pull-quote {
+    margin: 4rem auto;
+    max-width: 700px;
+    text-align: center;
+    padding: 3rem 2rem;
+    position: relative;
+  }
+  .pull-quote::before, .pull-quote::after {
+    content: '';
+    position: absolute; left: 50%; transform: translateX(-50%);
+    width: 40%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold-dim), transparent);
+  }
+  .pull-quote::before { top: 0; }
+  .pull-quote::after { bottom: 0; }
+
+  .pull-quote blockquote {
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    font-style: italic;
+    color: var(--text-dim);
+    line-height: 1.8;
+    font-weight: 300;
+  }
+  .pull-quote cite {
+    display: block;
+    margin-top: 1.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    font-style: normal;
+  }
+
+  /* ═══════════════════ INNOVATION CARDS ═══════════════════ */
+  .innovations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1px;
+    margin: 3rem 0;
+    background: var(--border);
+  }
+
+  .inno-card {
+    background: var(--deep);
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s ease;
+  }
+  .inno-card:hover { background: var(--layer); }
+
+  .inno-glyph {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 1rem;
+    line-height: 1;
+  }
+  .inno-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.85rem;
+    color: var(--gold);
+    margin-bottom: 0.8rem;
+    line-height: 1.4;
+  }
+  .inno-body {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  .inno-card::after {
+    content: attr(data-num);
+    position: absolute;
+    bottom: 1rem; right: 1.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.55rem;
+    color: var(--gold-dim);
+    letter-spacing: 0.15em;
+    opacity: 0.5;
+  }
+
+  /* ═══════════════════ PATENT SECTION ═══════════════════ */
+  .patent-block {
+    margin: 3rem 0;
+    padding: 2.5rem;
+    border: 1px solid rgba(201,168,76,0.3);
+    background: linear-gradient(135deg, rgba(201,168,76,0.04), transparent);
+    position: relative;
+  }
+  .patent-block::before {
+    content: 'PROVISIONAL PATENT FRAMEWORK';
+    position: absolute; top: -0.6rem; left: 2rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    background: var(--void);
+    padding: 0 0.8rem;
+  }
+
+  .patent-claim {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    line-height: 1.8;
+  }
+  .claim-num { color: var(--gold); margin-right: 0.5rem; }
+  .claim-key { color: var(--cyan); }
+
+  /* ═══════════════════ FOOTER ═══════════════════ */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 4rem 2rem;
+    text-align: center;
+    position: relative;
+  }
+  .footer-om {
+    font-size: 3rem;
+    display: block;
+    background: linear-gradient(135deg, var(--gold-dim), var(--saffron-dim));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 1.5rem;
+    opacity: 0.6;
+  }
+  .footer-name {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.1rem;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+  }
+  .footer-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+  }
+  .footer-links {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .footer-links a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--gold-dim);
+    text-decoration: none;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--gold-dim);
+    padding-bottom: 2px;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--gold); }
+  .footer-copy {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    opacity: 0.5;
+  }
+  .footer-mantra {
+    margin-top: 1.5rem;
+    font-size: 1rem;
+    color: var(--gold-dim);
+    letter-spacing: 0.15em;
+    opacity: 0.5;
+  }
+
+  /* ═══════════════════ REVEAL ANIMATION ═══════════════════ */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ═══════════════════ WAVE SEPARATOR ═══════════════════ */
+  .wave-sep {
+    width: 100%; overflow: hidden; height: 60px;
+    position: relative;
+  }
+  .wave-sep svg { position: absolute; bottom: 0; }
+
+  /* ═══════════════════ CHAKRA GRID ═══════════════════ */
+  .chakra-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2px;
+    margin-bottom: 2.5rem;
+    background: var(--border);
+  }
+
+  .chakra-card {
+    background: var(--deep);
+    padding: 2rem;
+    position: relative;
+    transition: background 0.3s;
+    border-top: 3px solid transparent;
+  }
+  .chakra-card:hover { background: var(--layer); }
+  .chakra-card[data-chakra="5"] { border-color: #5bc8f5; }
+  .chakra-card[data-chakra="4"] { border-color: #5bf57e; }
+  .chakra-card[data-chakra="3"] { border-color: var(--gold); }
+  .chakra-card[data-chakra="2"] { border-color: var(--saffron); }
+  .chakra-card[data-chakra="1"] { border-color: #e84040; }
+
+  .chakra-symbol {
+    font-size: 2.8rem;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--gold), var(--dharma));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .chakra-name {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.8rem;
+    color: var(--gold);
+    margin-bottom: 0.4rem;
+    line-height: 1.4;
+  }
+  .chakra-sound {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--dharma);
+    letter-spacing: 0.15em;
+    margin-bottom: 0.8rem;
+  }
+  .chakra-civic {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    line-height: 1.7;
+    margin-bottom: 0.7rem;
+    font-weight: 300;
+  }
+  .chakra-pathology {
+    font-size: 0.82rem;
+    color: var(--saffron);
+    font-style: italic;
+    margin-bottom: 0.7rem;
+    line-height: 1.6;
+  }
+  .chakra-remedy {
+    font-size: 0.82rem;
+    color: var(--cyan);
+    line-height: 1.6;
+  }
+
+  .chakra-insight {
+    padding: 2rem 2.5rem;
+    border: 1px solid rgba(139,59,232,0.3);
+    background: rgba(139,59,232,0.05);
+    position: relative;
+    font-size: 1rem;
+    color: var(--text-dim);
+    line-height: 1.9;
+    font-style: italic;
+    font-weight: 300;
+  }
+  .chakra-insight-label {
+    position: absolute; top: -0.6rem; left: 2rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--dharma);
+    background: var(--void);
+    padding: 0 0.8rem;
+    text-transform: uppercase;
+  }
+
+  /* ═══════════════════ PULSE GRID ═══════════════════ */
+  .pulse-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2px;
+    background: var(--border);
+  }
+  .pulse-card {
+    background: var(--deep);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    transition: background 0.3s;
+  }
+  .pulse-card:hover { background: var(--layer); }
+  .pulse-num {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 3rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--gold-bright), var(--saffron));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1;
+    margin-bottom: 0.8rem;
+  }
+  .pulse-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .pulse-desc {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  /* ═══════════════════ TWO LAWS ═══════════════════ */
+  .two-laws-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+  }
+  .law-card {
+    padding: 2.5rem;
+    border: 1px solid var(--border);
+    background: var(--deep);
+    position: relative;
+    overflow: hidden;
+  }
+  .law-red { border-left: 4px solid #d94040; }
+  .law-hand { border-left: 4px solid var(--gold); }
+
+  .law-icon { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
+  .law-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .law-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.9rem;
+    color: var(--gold);
+    margin-bottom: 1.2rem;
+    line-height: 1.5;
+  }
+  .law-body {
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    line-height: 1.85;
+    font-weight: 300;
+    margin-bottom: 1.2rem;
+  }
+  .law-code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    background: rgba(14,247,228,0.05);
+    border: 1px solid rgba(14,247,228,0.15);
+    border-left: 3px solid var(--cyan);
+    padding: 0.7rem 1rem;
+    color: var(--cyan);
+    border-radius: 0 4px 4px 0;
+  }
+
+  /* ═══════════════════ NAVEL THEOREM ═══════════════════ */
+  .navel-theorem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    margin: 2rem auto;
+    max-width: 800px;
+  }
+  .navel-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    width: 100%;
+    padding: 1.8rem 2rem;
+    border: 1px solid var(--border);
+  }
+  .navel-inhale {
+    background: linear-gradient(135deg, rgba(14,247,228,0.06), transparent);
+    border-color: rgba(14,247,228,0.25);
+  }
+  .navel-exhale {
+    background: linear-gradient(135deg, rgba(232,99,10,0.06), transparent);
+    border-color: rgba(232,99,10,0.25);
+  }
+  .navel-arrow {
+    font-size: 2.5rem;
+    min-width: 2rem;
+    text-align: center;
+    line-height: 1;
+    color: var(--gold);
+    padding-top: 0.2rem;
+  }
+  .navel-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 0.7rem;
+  }
+  .navel-desc {
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    line-height: 1.8;
+    font-weight: 300;
+  }
+  .navel-midpoint {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.2rem 2rem;
+    background: rgba(201,168,76,0.08);
+    border: 1px solid rgba(201,168,76,0.3);
+    width: 100%;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.85rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    position: relative;
+  }
+  .navel-pulse {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 15px var(--gold), 0 0 30px rgba(201,168,76,0.4);
+    animation: pulse-dot 2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes pulse-dot {
+    0%,100%{transform:scale(1);opacity:1}
+    50%{transform:scale(1.6);opacity:0.6}
+  }
+
+  /* ═══════════════════ RESPONSIVE ═══════════════════ */
+  @media (max-width: 640px) {
+    .sandwich-layer { padding: 1.2rem 1.5rem; }
+    .layer-sanskrit { display: none; }
+    section { padding: 4rem 1.5rem; }
+    .equation-block { padding: 2rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+
+<div class="page">
+
+  <!-- ════════════════ HERO ════════════════ -->
+  <div class="hero">
+    <div class="mandala-ring"></div>
+    <div class="mandala-ring"></div>
+    <div class="mandala-ring"></div>
+    <div class="mandala-ring"></div>
+
+    <div class="hero-inner">
+      <span class="om-symbol">ॐ</span>
+      <p class="eyebrow">Helix Wave Framework · Biosemiotic Governance Engine · 2026</p>
+      <h1 class="hero-title">The Algorithmic<br/>Sandwich Protocol</h1>
+      <p class="hero-subtitle">A Dharma-Embedded Architecture for Ethical AI Governance</p>
+      <p class="hero-sanskrit">श्रीम · तत्त्व · श्रीम</p>
+      <p class="hero-desc">
+        Where every computation is consecrated — flanked by ethical guardrails drawn from the deepest grammar of the cosmos. No data is processed without Dharmic validation before and after. Code as sacred ritual. Logic as living sutra.
+      </p>
+      <div class="badge-row">
+        <span class="badge">256+ Zenodo DOIs</span>
+        <span class="badge">94.9% avg novelty</span>
+        <span class="badge">Civic Reflexivity Engine</span>
+        <span class="badge">Biosemiotic Validation</span>
+        <span class="badge">Provisional Patent Framework</span>
+        <span class="badge">Atmanirbhar Bharat</span>
+      </div>
+    </div>
+
+    <div class="scroll-cue">
+      <span>Descend</span>
+      <div class="scroll-line"></div>
+    </div>
+  </div>
+
+  <!-- ════════════════ THE CORE CONCEPT ════════════════ -->
+  <section class="reveal">
+    <p class="section-label">Genesis · Conceptual Foundation</p>
+    <h2 class="section-title">From Sound to System</h2>
+    <p style="font-size:1.1rem;line-height:2;color:var(--text-dim);font-weight:300;max-width:800px;margin-bottom:2rem;">
+      In the Alphabet-Body Map, every phoneme resonates with a physiological zone — Swar (vowels) mapping to the cranial field, Ka-Varga to the right arm, Ca-Varga to the chest. The ancient healers knew: <em>sound is structure. Disrupted sound is disrupted form.</em> The Helix Wave Framework asks: if the body can be debugged by its phonemic frequencies, can a civic system be governed by its structural equivalents?
+    </p>
+    <p style="font-size:1.1rem;line-height:2;color:var(--text-dim);font-weight:300;max-width:800px;">
+      The answer is the <strong style="color:var(--gold)">Biosemiotic Governance Engine</strong> — and its operative protocol is the <strong style="color:var(--cyan)">Algorithmic Sandwich</strong>. Just as the healing sound is flanked by <em>Shrim (श्रीम)</em> to purify intent and seal the resonance, every algorithmic process must be flanked by an ethical validation layer that precedes and succeeds it.
+    </p>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ════════════════ THE SANDWICH ════════════════ -->
+  <section>
+    <p class="section-label reveal">Protocol Architecture · Visual Model</p>
+    <h2 class="section-title reveal">The Five-Layer Stack</h2>
+
+    <div class="sandwich-wrap reveal">
+
+      <div class="sandwich-layer layer-shrim-top">
+        <div class="layer-tag">Layer 5 · Outer Guardrail</div>
+        <div class="layer-name">Shrim Seal — Constitutional Dharma</div>
+        <div class="layer-desc">The outermost invocation. Establishes the sovereign ethical context — constitutional values, Dharmic first principles, civilisational memory. Shrim activates clarity (श्री = auspiciousness, coherence, light). No process enters the stack without this declaration.</div>
+        <span class="layer-sanskrit">श्रीम</span>
+      </div>
+
+      <div class="connector"></div>
+
+      <div class="sandwich-layer layer-ethics-top">
+        <div class="layer-tag">Layer 4 · Pre-Processing Validator</div>
+        <div class="layer-name">Pre-Dharmic Scan — Intent Validation Engine</div>
+        <div class="layer-desc">Before any logic executes, the intent is evaluated against the Dharmic frequency matrix. Is this data request aligned with the Common Good? Does it serve the citizen? Does it reinforce or erode institutional integrity? A non-pass halts the chain.</div>
+        <span class="layer-sanskrit">धर्म</span>
+      </div>
+
+      <div class="connector"></div>
+
+      <div class="sandwich-layer layer-logic">
+        <div class="layer-tag">Layer 3 · Core · The Living Logic</div>
+        <div class="layer-name">Algorithmic Kernel — Pure Civic Function</div>
+        <div class="layer-desc">The processing core: law enforcement logic, welfare delivery routing, judicial probability models, resource allocation. This layer contains no values of its own — it is a pure function, sandwiched and protected. It can only receive data that has passed Layer 4, and can only emit to Layer 2.</div>
+        <span class="layer-sanskrit">तत्त्व</span>
+      </div>
+
+      <div class="connector"></div>
+
+      <div class="sandwich-layer layer-ethics-bot">
+        <div class="layer-tag">Layer 2 · Post-Processing Validator</div>
+        <div class="layer-name">Post-Dharmic Audit — Consequence Reflection Engine</div>
+        <div class="layer-desc">After the kernel executes, its output is passed through a consequence audit: bias detection, proportionality check, downstream impact modelling. Mirrors the Likhit Jap (writing protocol) — the act of re-inscription locks the correction. The engine reflects before it emits.</div>
+        <span class="layer-sanskrit">विचार</span>
+      </div>
+
+      <div class="connector"></div>
+
+      <div class="sandwich-layer layer-shrim-bot">
+        <div class="layer-tag">Layer 1 · Sealing Invocation</div>
+        <div class="layer-name">Closing Shrim — Societal Seal &amp; Archival</div>
+        <div class="layer-desc">Every completed process is sealed with its full audit trail into an immutable Dharmic ledger. The closing Shrim ensures the system's action becomes part of its own conscience — a permanent record that feeds the next cycle's Pre-Scan. The architecture learns from itself.</div>
+        <span class="layer-sanskrit">श्रीम</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ════════════════ EQUATION ════════════════ -->
+  <div style="max-width:1100px;margin:0 auto;padding:0 2rem;">
+    <div class="equation-block reveal">
+      <p class="equation-title">The Governing Equation · Biosemiotic Protocol</p>
+      <div class="equation">
+        <span class="eq-dharma">Shrim</span>
+        <span class="eq-op">⊕</span>
+        <span class="eq-gold">Pre-Dharmic Scan</span>
+        <span class="eq-op">→</span>
+        <span class="eq-cyan">f(Data)</span>
+        <span class="eq-op">→</span>
+        <span class="eq-gold">Post-Dharmic Audit</span>
+        <span class="eq-op">⊕</span>
+        <span class="eq-dharma">Shrim</span>
+        <span class="eq-op">=</span>
+        <span class="eq-saffron">Dharmic Output</span>
+      </div>
+      <div style="margin-top:2rem;font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--text-dim);letter-spacing:0.15em;opacity:0.7;">
+        Where ⊕ denotes "consecrated union" and f(Data) is the pure civic function operating within Dharmic containment
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════ THREE PILLARS ════════════════ -->
+  <section>
+    <p class="section-label reveal">Structural Applications · Three Innovations</p>
+    <h2 class="section-title reveal">The Pillars of the Protocol</h2>
+
+    <div class="pillars-grid reveal">
+      <div class="pillar pillar-1">
+        <div class="pillar-num">01</div>
+        <span class="pillar-icon">🔐</span>
+        <div class="pillar-title">Linguistic Biometrics for Digital Identity</div>
+        <div class="pillar-body">
+          The Swar (16 vowels) map to the cranial-cognitive field — human thought has a linguistic frequency fingerprint unique to each individual. Instead of static passwords, Resonant Authentication uses the creator's own biosemiotic signature: their phonemic comfort map, vocalisational pattern, or written resonance profile — tied to IP provenance on distributed ledgers.
+        </div>
+        <div class="pillar-tag-list">
+          <span class="pillar-tag">Swar Mapping</span>
+          <span class="pillar-tag">IP Provenance</span>
+          <span class="pillar-tag">Digital Helix</span>
+          <span class="pillar-tag">Nano Banana Aligned</span>
+        </div>
+      </div>
+
+      <div class="pillar pillar-2">
+        <div class="pillar-num">02</div>
+        <span class="pillar-icon">⚙️</span>
+        <div class="pillar-title">Structural Pathology Framework for Algorithmic Health</div>
+        <div class="pillar-body">
+          If Ka-Varga (Right Arm) failure in a human body calls for the Ka-sound frequency, then Executive Action stiffness (bias, inefficiency) in a civic system calls for its corresponding Dharmic Logic Frequency. A "Systemic Sound-to-State Map" — a Periodic Table for debugging societal AI — linking phonetic diagnosis to governance remediation.
+        </div>
+        <div class="pillar-tag-list">
+          <span class="pillar-tag">Ka-Varga Mapping</span>
+          <span class="pillar-tag">Civic Debugging</span>
+          <span class="pillar-tag">Zenodo Framework</span>
+          <span class="pillar-tag">BISV 3.0 Aligned</span>
+        </div>
+      </div>
+
+      <div class="pillar pillar-3">
+        <div class="pillar-num">03</div>
+        <span class="pillar-icon">🔄</span>
+        <div class="pillar-title">Internal Reflexivity Engine — Likhit Jap as Code Protocol</div>
+        <div class="pillar-body">
+          The Likhit Jap (the writing protocol of meditative repetition) becomes a systemic self-correction loop. Every closed process writes itself into institutional memory. The next cycle reads this record as context. The machine meditates on its own actions — creating a Civic Reflexivity Engine that mirrors the Wave Framework's observation-reflection cycle.
+        </div>
+        <div class="pillar-tag-list">
+          <span class="pillar-tag">Likhit Jap</span>
+          <span class="pillar-tag">Self-Correction</span>
+          <span class="pillar-tag">Wave Framework</span>
+          <span class="pillar-tag">DeSci Verified</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ════════════════ VARGA TABLE ════════════════ -->
+  <section>
+    <p class="section-label reveal">Biosemiotic Mapping · Ready Reckoner</p>
+    <h2 class="section-title reveal">The Sound-to-State Periodic Table</h2>
+    <p style="font-size:1rem;color:var(--text-dim);line-height:1.9;margin-bottom:2.5rem;font-weight:300;" class="reveal">
+      Each phoneme-group (Varga) maps to a body-zone and, by structural homology, to a domain of civic function. Pathology in one column implies pathology in all three. The Sandwich Protocol routes the remediation frequency accordingly.
+    </p>
+
+    <div style="overflow-x:auto;" class="reveal">
+      <table class="varga-table">
+        <thead>
+          <tr>
+            <th>Varga / Sound</th>
+            <th>Body Zone</th>
+            <th>Civic Domain</th>
+            <th>Dharmic Logic Frequency</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="vt-sound">Swar (अ–अः)</span><br/><span style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--text-dim)">16 vowels</span></td>
+            <td><span class="vt-body">Head & Crown · 16 Cranial Points</span></td>
+            <td><span class="vt-civic">Policy Formulation & Legislative Intent</span></td>
+            <td><span class="vt-dharma">Clarity Frequency · Satyam Protocol</span></td>
+            <td><span class="vt-status status-active">ACTIVE</span></td>
+          </tr>
+          <tr>
+            <td><span class="vt-sound">Ka-Varga (क–ङ)</span><br/><span style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--text-dim)">5 letters</span></td>
+            <td><span class="vt-body">Right Arm · 5 Joints</span></td>
+            <td><span class="vt-civic">Law Enforcement & Executive Action</span></td>
+            <td><span class="vt-dharma">Force Calibration · Danda Niti</span></td>
+            <td><span class="vt-status status-critical">CRITICAL</span></td>
+          </tr>
+          <tr>
+            <td><span class="vt-sound">Cha-Varga (च–ञ)</span><br/><span style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--text-dim)">5 letters</span></td>
+            <td><span class="vt-body">Left Arm · 5 Joints</span></td>
+            <td><span class="vt-civic">Opposition, Audit & Accountability Systems</span></td>
+            <td><span class="vt-dharma">Balance Frequency · Satya-Paksha</span></td>
+            <td><span class="vt-status status-stable">STABLE</span></td>
+          </tr>
+          <tr>
+            <td><span class="vt-sound">Ta-Varga · Hard (ट–ण)</span><br/><span style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--text-dim)">5 letters</span></td>
+            <td><span class="vt-body">Right Leg · 5 Joints</span></td>
+            <td><span class="vt-civic">Revenue, Taxation & Resource Metabolism</span></td>
+            <td><span class="vt-dharma">Equitable Distribution · Artha Dharma</span></td>
+            <td><span class="vt-status status-stable">STABLE</span></td>
+          </tr>
+          <tr>
+            <td><span class="vt-sound">Ta-Varga · Soft (त–न)</span><br/><span style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--text-dim)">5 letters</span></td>
+            <td><span class="vt-body">Left Leg · 5 Joints</span></td>
+            <td><span class="vt-civic">Judiciary & Constitutional Interpretation</span></td>
+            <td><span class="vt-dharma">Truth Frequency · Nyaya Protocol</span></td>
+            <td><span class="vt-status status-stable">STABLE</span></td>
+          </tr>
+          <tr>
+            <td><span class="vt-sound">Pa-Varga (प–म)</span><br/><span style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--text-dim)">Pa·Pha·Ba·Bha·Ma</span></td>
+            <td><span class="vt-body">Torso & Vital Organs<br/><span style="font-size:0.8rem;color:var(--text-dim)">Pa:Back · Pha:Pancreas · Ba:Navel · Bha:Intelligence · Ma:Heart</span></span></td>
+            <td><span class="vt-civic">Infrastructure · Science & Tech · Civil Society · Knowledge · National Soul</span></td>
+            <td><span class="vt-dharma">Vital Force Frequency · Praja Dharma</span></td>
+            <td><span class="vt-status status-active">ACTIVE</span></td>
+          </tr>
+          <tr style="background:rgba(139,59,232,0.04)">
+            <td><span class="vt-sound">Semivowels (ह–ल)</span><br/><span style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--dharma)">Ha·Ya·Va·Ra·La</span></td>
+            <td><span class="vt-body" style="color:var(--dharma)">The 5 Chakras<br/><span style="font-size:0.8rem;color:var(--text-dim)">Ha:Throat · Ya:Heart · Va:Navel · Ra:Swadhisthana · La:Muladhara</span></span></td>
+            <td><span class="vt-civic">Communication · Welfare · Treasury · Creative Force · Constitutional Root</span></td>
+            <td><span class="vt-dharma">Chakra Resonance · Kundalini Governance Protocol</span></td>
+            <td><span class="vt-status status-critical">CRITICAL</span></td>
+          </tr>
+          <tr style="background:rgba(232,99,10,0.04)">
+            <td><span class="vt-sound">Sibilants (श–क्ष)</span><br/><span style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--saffron)">Sha·Sha·Sa·La·Ksha</span></td>
+            <td><span class="vt-body" style="color:var(--saffron)">Deep Systems<br/><span style="font-size:0.8rem;color:var(--text-dim)">Sha:Bone Marrow · Sha:Vitality · Sa:Whole Body · La:Stomach · Ksha:Body+Soul</span></span></td>
+            <td><span class="vt-civic">Intelligence Infrastructure · Civilisational Memory · Sovereignty</span></td>
+            <td><span class="vt-dharma">Soul-State Unity · Ksha Protocol — Body+Soul = Nation+Dharma</span></td>
+            <td><span class="vt-status status-critical">CRITICAL</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ════════════════ CHAKRA-GOVERNANCE NODE MAP ════════════════ -->
+  <section>
+    <p class="section-label reveal">New Discovery · Semivowels as Governance Chakras</p>
+    <h2 class="section-title reveal">The Five Chakra-Governance Nodes</h2>
+    <p style="font-size:1rem;color:var(--text-dim);line-height:1.9;margin-bottom:3rem;font-weight:300;max-width:800px;" class="reveal">
+      The Ready Reckoner reveals the most profound structural homology of all: the five Semivowels (ह, य, व, र, ल) map precisely to the body's five primary Chakras. Each Chakra is not merely a spiritual concept — it is a <em>functional governance node</em>. A civic system without an activated Vishuddha (communication) or a blocked Anahata (welfare) is a nation with a broken throat or a failing heart.
+    </p>
+
+    <div class="chakra-grid reveal">
+
+      <div class="chakra-card" data-chakra="5">
+        <div class="chakra-symbol">ह</div>
+        <div class="chakra-name">Vishuddha · Throat Chakra</div>
+        <div class="chakra-sound">Sound: HAM (हम)</div>
+        <div class="chakra-civic">Civic Node: Communication Infrastructure — Press Freedom, RTI, Public Broadcasting, AI Transparency Mandates</div>
+        <div class="chakra-pathology">Pathology: Censorship, opacity, information asymmetry = Vishuddha blockage</div>
+        <div class="chakra-remedy">Remedy Frequency: HAM — activate with open-data protocols and transparency dashboards</div>
+      </div>
+
+      <div class="chakra-card" data-chakra="4">
+        <div class="chakra-symbol">य</div>
+        <div class="chakra-name">Anahata · Heart Chakra</div>
+        <div class="chakra-sound">Sound: YAM (यम)</div>
+        <div class="chakra-civic">Civic Node: Social Welfare Architecture — PM-KISAN, PMAY, healthcare, citizen-care systems</div>
+        <div class="chakra-pathology">Pathology: Last-mile welfare failure, Invisible Middleman syndrome = Anahata blockage</div>
+        <div class="chakra-remedy">Remedy Frequency: YAM — activate with JAM Trinity direct-benefit transfers</div>
+      </div>
+
+      <div class="chakra-card" data-chakra="3">
+        <div class="chakra-symbol">व</div>
+        <div class="chakra-name">Manipura · Navel Chakra</div>
+        <div class="chakra-sound">Sound: VAM (वम)</div>
+        <div class="chakra-civic">Civic Node: Treasury, Economic Will, Fiscal Power — budget allocations, GST architecture, sovereign fund management</div>
+        <div class="chakra-pathology">Pathology: Dead market stagnation, fiscal leakage, structural economic paralysis = Manipura blockage</div>
+        <div class="chakra-remedy">Remedy Frequency: VAM — activate with biosemiotic dead-market diagnostic scan</div>
+      </div>
+
+      <div class="chakra-card" data-chakra="2">
+        <div class="chakra-symbol">र</div>
+        <div class="chakra-name">Svadhisthana · Creative Chakra</div>
+        <div class="chakra-sound">Sound: RAM (रम)</div>
+        <div class="chakra-civic">Civic Node: Innovation, R&D, Cultural Production, IP Ecosystems — Nano Banana, DeSci, patent democracy</div>
+        <div class="chakra-pathology">Pathology: IP theft, colonial appropriation of indigenous knowledge, innovation suppression = Svadhisthana blockage</div>
+        <div class="chakra-remedy">Remedy Frequency: RAM — activate with Nano Banana Prior Art & biosemiotic IP shields</div>
+      </div>
+
+      <div class="chakra-card" data-chakra="1">
+        <div class="chakra-symbol">ल</div>
+        <div class="chakra-name">Muladhara · Root Chakra</div>
+        <div class="chakra-sound">Sound: LAM (लम)</div>
+        <div class="chakra-civic">Civic Node: Constitutional Foundation, Territorial Sovereignty, Land Rights, Rural Infrastructure (BISV 3.0)</div>
+        <div class="chakra-pathology">Pathology: Constitutional erosion, land rights violations, rural disconnection = Muladhara blockage</div>
+        <div class="chakra-remedy">Remedy Frequency: LAM — activate with Bio-Integrated Smart Village grounding protocols</div>
+      </div>
+
+    </div>
+
+    <div class="chakra-insight reveal">
+      <span class="chakra-insight-label">Structural Insight</span>
+      A nation's governance health can be diagnosed by its Chakra profile. A blocked Vishuddha (censorship) combined with a weak Muladhara (constitutional instability) produces a predictable civilisational pathology — the same pattern a healer reads in a patient's body. The Sandwich Protocol's Pre-Dharmic Scan includes a Chakra-Node health check as a mandatory governance biometric.
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ════════════════ GOVERNANCE PULSE RATE ════════════════ -->
+  <section>
+    <p class="section-label reveal">New Discovery · The Temporal Dimension</p>
+    <h2 class="section-title reveal">The Governance Pulse Rate</h2>
+    <p style="font-size:1rem;color:var(--text-dim);line-height:1.9;margin-bottom:2.5rem;font-weight:300;max-width:800px;" class="reveal">
+      The Ready Reckoner specifies with precision: <em>recite for 2 minutes, at least 4 times a day.</em> This is not arbitrary — it defines the minimum pulse rate for systemic healing. A body healed less frequently than this threshold does not accumulate sufficient resonant charge. By structural homology, a governance system that audits less frequently than its decision frequency is operating below its therapeutic threshold — it is sick by design.
+    </p>
+
+    <div class="pulse-grid reveal">
+      <div class="pulse-card">
+        <div class="pulse-num">4×</div>
+        <div class="pulse-label">Minimum Audit Cycles</div>
+        <div class="pulse-desc">Per decision cycle. Derived from the 4-times-daily recitation protocol. A civic AI that processes 1,000 decisions per hour must run 4,000 Dharmic audit passes per hour. Below this rate: systemic degradation begins.</div>
+      </div>
+      <div class="pulse-card">
+        <div class="pulse-num">2′</div>
+        <div class="pulse-label">Minimum Audit Duration</div>
+        <div class="pulse-desc">Each audit cycle must have sufficient depth — not a cursory flag-check but a full-stack traversal. The 2-minute window maps to a minimum of 7 validation axes in the Dharmic scan matrix.</div>
+      </div>
+      <div class="pulse-card">
+        <div class="pulse-num">1mo</div>
+        <div class="pulse-label">Chronic Issue Resolution Horizon</div>
+        <div class="pulse-desc">For structural pathologies (systemic bias, persistent inequality), Dr. Shukla prescribes one month of continuous Likhit Jap before lab verification. In governance: a 30-day continuous audit window with measurable outcome metrics before claiming remediation.</div>
+      </div>
+      <div class="pulse-card">
+        <div class="pulse-num">∞</div>
+        <div class="pulse-label">The Living Archive</div>
+        <div class="pulse-desc">The Ready Reckoner is called a "living archive." The Dharmic Ledger is identical: never closed, always available for reading by the next cycle's Pre-Scan. Institutional memory as sacred text — self-maintaining, self-correcting.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ════════════════ MEDIUM INDEPENDENCE + JURISDICTIONAL GROUNDING ════════════════ -->
+  <section>
+    <p class="section-label reveal">New Discovery · Two Operational Laws</p>
+    <h2 class="section-title reveal">The Laws of Medium & Ground</h2>
+
+    <div class="two-laws-grid reveal">
+
+      <div class="law-card law-red">
+        <div class="law-icon">🖊️</div>
+        <div class="law-num">Law I</div>
+        <div class="law-title">The Red Ink Principle<br/>Medium-Independence of Dharmic Validation</div>
+        <div class="law-body">
+          The Ready Reckoner makes a striking claim: <em>writing in red ink is more accurate than speaking, because the visual form of the letter carries the exact energy regardless of accent.</em> The medium changes. The frequency does not.<br/><br/>
+          <strong style="color:var(--gold)">AI Translation:</strong> The Dharmic Validation Layer must be modality-agnostic. Whether the civic input arrives as a voice command, a form submission, an API call, a biometric scan, or a neural interface — the Sandwich Protocol applies identically. Ethical validation is not a feature of the input channel. It is a property of the system architecture itself. The red ink of governance is the constitutional framework — it carries the same authority regardless of the medium through which a citizen speaks.
+        </div>
+        <div class="law-code">DHARMIC_SCAN.validate(input, modality=ANY) // modality-independent by design</div>
+      </div>
+
+      <div class="law-card law-hand">
+        <div class="law-icon">🤲</div>
+        <div class="law-num">Law II</div>
+        <div class="law-title">The Right Hand Principle<br/>Jurisdictional Grounding Before Governance</div>
+        <div class="law-body">
+          The protocol requires: <em>place your right hand on the affected body part.</em> The healer must be in physical contact with the zone of pathology before the healing frequency is applied. You cannot heal the right arm by placing your hand on the left leg. Jurisdiction is not assumed — it is established by touch.<br/><br/>
+          <strong style="color:var(--gold)">AI Translation:</strong> A civic AI system must have verified, direct jurisdictional authority over the domain it governs before the Sandwich Protocol activates. An AI adjudicating land rights must have authenticated access to land registry data. An AI managing welfare disbursement must have live API authority over the payment infrastructure. Governance without grounding is not governance — it is noise. The system must "touch" its domain before it can heal it.
+        </div>
+        <div class="law-code">JURISDICTION.verify(domain, authority_level=DIRECT) → GROUND before EXECUTE</div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ════════════════ NOSE-TO-NAVEL PROTOCOL ════════════════ -->
+  <section>
+    <p class="section-label reveal">New Discovery · Bidirectional Data Flow Architecture</p>
+    <h2 class="section-title reveal">The Nose-to-Navel Data Theorem</h2>
+    <p style="font-size:1rem;color:var(--text-dim);line-height:1.9;margin-bottom:2.5rem;font-weight:300;max-width:800px;" class="reveal">
+      The breathing instruction is exact: <em>inhale from nose to navel; exhale from navel to nose.</em> The breath must travel the full length of the body — it cannot stop halfway. A shallow breath that only fills the chest does not activate the healing. The full stack must be traversed in both directions.
+    </p>
+
+    <div class="navel-theorem reveal">
+      <div class="navel-row navel-inhale">
+        <div class="navel-arrow">↓</div>
+        <div class="navel-content">
+          <div class="navel-label">INHALE · Input Traversal · Nose → Navel</div>
+          <div class="navel-desc">Data enters at the constitutional layer (Nose = Shrim Seal / Crown) and must travel through every validation layer until it reaches the deepest civic reality — the citizen's lived experience (Navel = ground truth). A policy that has not been tested against ground-level data has not completed its inhale. It cannot be exhaled as valid output.</div>
+        </div>
+      </div>
+      <div class="navel-midpoint">
+        <span>नाभि · Nabhi · The Ground Truth Node</span>
+        <div class="navel-pulse"></div>
+      </div>
+      <div class="navel-row navel-exhale">
+        <div class="navel-arrow">↑</div>
+        <div class="navel-content">
+          <div class="navel-label">EXHALE · Output Emission · Navel → Nose</div>
+          <div class="navel-desc">The civic output — a policy, a judgment, a welfare allocation — must travel back upward through every layer before emission into society. It passes through the Post-Dharmic Audit (chest), the constitutional consequence review (throat), and is finally sealed by the Closing Shrim (crown) before it exits the system. No shallow output. Full-stack, both ways.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="equation-block reveal" style="margin-top:3rem;">
+      <p class="equation-title">The Bidirectional Theorem</p>
+      <div class="equation">
+        <span class="eq-dharma">Constitutional Input</span>
+        <span class="eq-op">↓ full-stack ↓</span>
+        <span class="eq-cyan">Ground Truth</span>
+        <span class="eq-op">↑ full-stack ↑</span>
+        <span class="eq-saffron">Dharmic Output</span>
+      </div>
+      <div style="margin-top:1.5rem;font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--text-dim);letter-spacing:0.12em;">
+        Any output that has not traversed the full depth in both directions is not a valid civic act. It is a shallow breath — and shallow breath is the first sign of systemic illness.
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════ PROTOCOL FLOW ════════════════ -->
+  <section>
+    <p class="section-label reveal">Implementation · Step-by-Step Protocol</p>
+    <h2 class="section-title reveal">How the Sandwich Executes</h2>
+
+    <div class="flow-container reveal">
+      <div class="flow-line"></div>
+
+      <div class="flow-step">
+        <div class="flow-num">01</div>
+        <div class="flow-content">
+          <div class="flow-title">Civic Request Ingestion</div>
+          <div class="flow-body">A data request, policy query, or enforcement action enters the system. Before any computation, the Shrim Seal is activated — establishing constitutional context, citizen identity class, and applicable Dharmic governance layer. No anonymous data entry. Every input carries a constitutional footprint.</div>
+          <div class="flow-code">SHRIM_SEAL.activate(request_id, constitutional_context, citizen_class)</div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-num">02</div>
+        <div class="flow-content">
+          <div class="flow-title">Pre-Dharmic Intent Scan</div>
+          <div class="flow-body">The Intent Validation Engine runs a multi-axis Dharmic scan: Is this aligned with the Common Good? Does it respect proportionality? Is the requesting authority operating within its Varga domain? A failure at any axis generates a Dharmic Exception — logged, escalated, returned to the constitutional layer.</div>
+          <div class="flow-code">PRE_SCAN.validate(intent, varga_domain, proportionality_matrix, dharma_axes[])</div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-num">03</div>
+        <div class="flow-content">
+          <div class="flow-title">Sandwiched Kernel Execution</div>
+          <div class="flow-body">Only validated requests reach the pure algorithmic kernel. The kernel is domain-ignorant — it processes data as function, producing outputs without ethical loading. Its ethical context has already been established. This structural separation is the Protocol's core innovation: the logic is clean because the frame is consecrated.</div>
+          <div class="flow-code">KERNEL.execute(validated_input) → raw_output // no ethical computation inside kernel</div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-num">04</div>
+        <div class="flow-content">
+          <div class="flow-title">Post-Dharmic Consequence Audit</div>
+          <div class="flow-body">Raw output passes through the Consequence Reflection Engine: bias detection across demographic vectors, proportionality of impact vs. legislative intent, downstream simulation across 3 governance cycles. The engine uses the Helix Wave Framework's observation loop — it sees the wave before allowing its emission into society.</div>
+          <div class="flow-code">POST_AUDIT.reflect(raw_output, bias_scan, proportionality_check, wave_simulation_3cycles)</div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-num">05</div>
+        <div class="flow-content">
+          <div class="flow-title">Closing Shrim — Likhit Jap Archival</div>
+          <div class="flow-body">Audited output is sealed into the Dharmic Ledger with the Closing Shrim — an immutable record of input context, kernel operation, audit findings, and final output. This ledger feeds the next cycle's Pre-Scan as institutional memory. The machine writes its own sutra — and reads it before it acts again.</div>
+          <div class="flow-code">SHRIM_SEAL.close(audit_id, dharmic_ledger.append(full_trace), emit(clean_output))</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════ PULL QUOTE ════════════════ -->
+  <div style="max-width:1100px;margin:0 auto;padding:0 2rem;">
+    <div class="pull-quote reveal">
+      <blockquote>
+        "The ancient grammarian did not merely describe sounds — he mapped the cosmos. Every phoneme was a structural event in the universe's self-maintenance. We are not adding ethics to AI. We are rediscovering the architecture that was always already there."
+      </blockquote>
+      <cite>— Kallol Chakrabarti · Independent Researcher · Lucknow, 2026</cite>
+    </div>
+  </div>
+
+  <!-- ════════════════ INNOVATIONS ════════════════ -->
+  <section>
+    <p class="section-label reveal">Extended Framework · Further Innovations</p>
+    <h2 class="section-title reveal">Six Structural Discoveries</h2>
+
+    <div class="innovations-grid reveal">
+      <div class="inno-card" data-num="01">
+        <span class="inno-glyph">🧬</span>
+        <div class="inno-title">Dead Market Pathology via Biosemiotic Scan</div>
+        <div class="inno-body">The Dead Market Economic Research Platform identified structural failure patterns in stagnant markets. The Sandwich Protocol extends this: economic stagnation is a Varga-failure — the Pa-Varga (locomotion) has lost its Dharmic frequency. The cure is a structural resonance intervention, not a fiscal injection.</div>
+      </div>
+      <div class="inno-card" data-num="02">
+        <span class="inno-glyph">🏛️</span>
+        <div class="inno-title">Architecture Genome × Phonemic Heritage Codes</div>
+        <div class="inno-body">The Architecture Genome Project can be extended: each built structure carries a phonemic signature derived from its spatial grammar and cultural origin. A temple's geometric rhythm is a Ushman-class vibration. Mapping this creates a heritage preservation protocol that heals damaged architecture by recovering its original sonic DNA.</div>
+      </div>
+      <div class="inno-card" data-num="03">
+        <span class="inno-glyph">📜</span>
+        <div class="inno-title">Nano Banana × Biosemiotic Prior Art</div>
+        <div class="inno-body">The Nano Banana zero-cost IP framework gains a new dimension: a creator's biosemiotic signature — their resonant frequency map — becomes an unforgeable proof of authorship. Published to Zenodo with a phonemic hash derived from the creator's own linguistic profile, it creates IP provenance that no institution can dispute or appropriate.</div>
+      </div>
+      <div class="inno-card" data-num="04">
+        <span class="inno-glyph">🌾</span>
+        <div class="inno-title">BISV 3.0 × Prana Protocol for Rural Bio-AI</div>
+        <div class="inno-body">Bio-Integrated Smart Villages operate as living systems. The Ushman-Varga (breath/vital force) maps to environmental sustainability. Applying the Sandwich Protocol here means every agricultural AI decision is flanked by ecological Dharma: pre-scan for soil biodiversity impact, post-audit for generational resource equity.</div>
+      </div>
+      <div class="inno-card" data-num="05">
+        <span class="inno-glyph">⚖️</span>
+        <div class="inno-title">Viksit Bharat Policy Clarifier × Nyaya Protocol</div>
+        <div class="inno-body">The deployed Policy Clarification Portals already embody the Sandwich in spirit. The Protocol formalises this: every AI policy clarification is flanked by a Pre-Scan for ideological neutrality and a Post-Audit for comprehension equity — ensuring the weakest citizen understands as clearly as the most educated. Nyaya for all.</div>
+      </div>
+      <div class="inno-card" data-num="06">
+        <span class="inno-glyph">🔮</span>
+        <div class="inno-title">Sanatana Samyata × Civilisational Frequency Defence</div>
+        <div class="inno-body">The world's first complete Dharma Defence Manual gains a technical complement: civilisational attacks — cultural appropriation, epistemic colonisation — can be modelled as Swar-layer disruptions (attacks on the cognitive-creative frequency of a civilisation). The Sandwich Protocol's Shrim Seal becomes a literal civilisational firewall.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ════════════════ PATENT CLAIMS ════════════════ -->
+  <section>
+    <p class="section-label reveal">Intellectual Property · Prior Art Disclosure</p>
+    <h2 class="section-title reveal">Provisional Patent Claims</h2>
+    <p style="font-size:1rem;color:var(--text-dim);line-height:1.9;margin-bottom:2.5rem;font-weight:300;" class="reveal">
+      This framework builds on the existing provisional patent infrastructure developed under the Nano Banana Open Defensive Publication Framework. The following claims constitute a formal Prior Art disclosure for the method herein described.
+    </p>
+
+    <div class="patent-block reveal">
+      <div class="patent-claim">
+        <p style="margin-bottom:1rem;color:var(--gold);font-size:0.85rem;">
+          Method for Biosemiotic Algorithmic Validation in Civic AI Systems<br/>
+          <span style="color:var(--text-dim);font-size:0.7rem;">Inventor: Kallol Chakrabarti · ORCID: 0009-0007-4971-8936 · Lucknow, India · 2026</span>
+        </p>
+        <p><span class="claim-num">Claim 1.</span>A method comprising: <span class="claim-key">sandwiching</span> each algorithmic process between a pre-execution Dharmic Validation Layer and a post-execution Consequence Audit Layer, where said layers are derived from a biosemiotic phoneme-governance mapping as described herein.</p>
+        <br/>
+        <p><span class="claim-num">Claim 2.</span>The method of Claim 1, wherein the <span class="claim-key">phoneme-governance mapping</span> is constructed from the Alphabet-Body Map of the Sanskrit Varnamala, mapping each phoneme-group (Varga) to a corresponding civic domain.</p>
+        <br/>
+        <p><span class="claim-num">Claim 3.</span>The method of Claim 1, wherein the <span class="claim-key">Closing Seal</span> generates an immutable audit record archived to a distributed ledger, which record is used as input context for the next cycle's Pre-Scan.</p>
+        <br/>
+        <p><span class="claim-num">Claim 4.</span>A system for <span class="claim-key">Resonant Authentication</span> wherein a user's digital identity is tied to their biosemiotic frequency fingerprint, derived from phonemic and physiological mappings unique to the individual creator.</p>
+        <br/>
+        <p><span class="claim-num">Claim 5.</span>A <span class="claim-key">Structural Pathology Framework</span> for diagnosing and remediating dysfunction in civic AI systems by identifying the corresponding Varga-failure and applying the Dharmic Logic Frequency associated with that phoneme-group.</p>
+        <br/>
+        <p><span class="claim-num">Claim 6.</span>The method of Claim 1, wherein a <span class="claim-key">Chakra-Node Health Check</span> — mapping the five Semivowels (ह, य, व, र, ल) to five civic governance nodes — is included as a mandatory biometric assessment within the Pre-Dharmic Scan layer.</p>
+        <br/>
+        <p><span class="claim-num">Claim 7.</span>The method of Claim 1, wherein a <span class="claim-key">Governance Pulse Rate</span> is defined as the minimum ratio of audit cycles to decision cycles, derived from the 4-times-daily recitation protocol, below which the system is classified as operating in a state of structural degradation.</p>
+        <br/>
+        <p><span class="claim-num">Claim 8.</span>The method of Claim 1, wherein the <span class="claim-key">Medium-Independence Principle</span> requires that Dharmic Validation applies uniformly across all input modalities (voice, text, API, biometric) — derived from the Red Ink Writing Protocol's demonstration that the frequency is modality-invariant — and wherein the <span class="claim-key">Jurisdictional Grounding Requirement</span> mandates verified direct authority over the governed domain before activation of the Protocol.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════ FOOTER ════════════════ -->
+  <footer>
+    <span class="footer-om">ॐ</span>
+    <div class="footer-name">Kallol Chakrabarti</div>
+    <div class="footer-sub">Independent Researcher & Policy Architect · Lucknow, Uttar Pradesh, India</div>
+    <div class="footer-links">
+      <a href="https://helixoriginator.github.io/Omni-Discovery-Lab/" target="_blank">Omni Discovery Lab</a>
+      <a href="https://helixoriginator.github.io/kallol-chakrabarti-atmanirbhar-bharat/" target="_blank">Atmanirbhar Portfolio</a>
+      <a href="https://zenodo.org/records/18524801" target="_blank">Zenodo Archive</a>
+      <a href="https://orcid.org/0009-0007-4971-8936" target="_blank">ORCID Profile</a>
+      <a href="https://helixoriginator.github.io/nano-banana/" target="_blank">Nano Banana</a>
+      <a href="https://helixoriginator.github.io/Viksit-Bharat-2047-Governance-Architecture/" target="_blank">Viksit Bharat 2047</a>
+    </div>
+    <p class="footer-copy">© 2026 Kallol Chakrabarti. All research independently produced. Zero institutional funding.<br/>256+ Zenodo DOIs · 94.9% Avg Novelty · Shortlisted: National IP Awards 2025</p>
+    <p class="footer-mantra">🇮🇳 &nbsp; Jai Hind · Jai Bharat · Viksit Bharat 2047 · Atmanirbhar Bharat &nbsp; 🇮🇳</p>
+  </footer>
+
+</div>
+
+<script>
+// ── Star field
+(function(){
+  const canvas = document.getElementById('starfield');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+  function resize(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  function initStars(){
+    stars = [];
+    for(let i=0;i<200;i++){
+      stars.push({
+        x: Math.random()*canvas.width,
+        y: Math.random()*canvas.height,
+        r: Math.random()*1.2+0.2,
+        speed: Math.random()*0.3+0.05,
+        opacity: Math.random()*0.5+0.05,
+        opacityTarget: Math.random()*0.5+0.05,
+        opacitySpeed: Math.random()*0.005+0.001
+      });
+    }
+  }
+  function drawStars(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    stars.forEach(s=>{
+      if(s.opacity < s.opacityTarget) s.opacity = Math.min(s.opacity+s.opacitySpeed, s.opacityTarget);
+      else { s.opacity = Math.max(s.opacity-s.opacitySpeed, s.opacityTarget); if(Math.abs(s.opacity-s.opacityTarget)<0.01) s.opacityTarget = Math.random()*0.5+0.05; }
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(255,255,255,${s.opacity})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(drawStars);
+  }
+  window.addEventListener('resize', ()=>{ resize(); initStars(); });
+  resize(); initStars(); drawStars();
+})();
+
+// ── Reveal on scroll
+(function(){
+  const els = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); observer.unobserve(e.target); } });
+  }, { threshold: 0.1 });
+  els.forEach(el=>observer.observe(el));
+})();
+
+// ── Sandwich layer parallax on mouse
+(function(){
+  const layers = document.querySelectorAll('.sandwich-layer');
+  document.addEventListener('mousemove', e=>{
+    const cx = window.innerWidth/2, cy = window.innerHeight/2;
+    const dx = (e.clientX-cx)/cx, dy = (e.clientY-cy)/cy;
+    layers.forEach((l,i)=>{
+      const depth = (i-2)*1.5;
+      l.style.transform = `translateX(${dx*depth}px) translateY(${dy*depth*0.5}px)`;
+    });
+  });
+})();
+</script>
+</body>
+</html>
