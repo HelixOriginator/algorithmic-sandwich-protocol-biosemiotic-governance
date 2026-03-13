@@ -201,11 +201,48 @@ Lucknow, Uttar Pradesh, India
 
 ---
 
-## Licence
+## Copyright & Intellectual Property Notice
 
-This work is published under **Creative Commons Attribution 4.0 International (CC BY 4.0).**
+**© 2026 Kallol Chakrabarti. All Rights Reserved.**
 
-You are free to share and adapt this work for any purpose provided you give appropriate credit to **Kallol Chakrabarti** with ORCID **0009-0007-4971-8936** and link to this repository.
+This work — including but not limited to the Algorithmic Sandwich Protocol, the Biosemiotic Governance Engine, the Sound-to-State Periodic Table, the Five Chakra-Governance Node Map, the Four Operational Laws, the Governance Pulse Rate, the Medium-Independence Principle, the Jurisdictional Grounding Requirement, the Nose-to-Navel Data Theorem, and all associated frameworks, diagrams, pseudocode, and conceptual structures contained herein — is the exclusive intellectual property of **Kallol Chakrabarti**, Independent Researcher, Lucknow, Uttar Pradesh, India (ORCID: 0009-0007-4971-8936).
+
+### This Work is Protected Under:
+- **Indian Copyright Act, 1957** — Original literary and artistic work
+- **Berne Convention** — Automatic international copyright protection in 181 countries
+- **TRIPS Agreement** — WTO intellectual property protections
+- **Nano Banana Open Defensive Publication Framework** — Prior art timestamped March 2026
+
+### Strictly Prohibited Without Written Permission:
+- ❌ Copying, reproducing, or duplicating any part of this framework
+- ❌ Publishing, distributing, or transmitting this work in any medium
+- ❌ Creating derivative works, adaptations, or modifications
+- ❌ Incorporating this framework into AI training datasets
+- ❌ Filing patent applications based on concepts disclosed herein
+- ❌ Presenting this framework as your own work in any academic, policy, or commercial context
+
+### Permitted Uses:
+- ✅ Citing this work with full attribution to Kallol Chakrabarti and ORCID 0009-0007-4971-8936
+- ✅ Referencing this framework in academic research with proper citation
+- ✅ Linking to this repository for educational purposes
+
+### Licence
+This work is published under **Creative Commons Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0).**
+
+This means you may share this work only if you:
+1. Give full credit to **Kallol Chakrabarti** with ORCID **0009-0007-4971-8936**
+2. Link to this repository
+3. Do **not** modify, adapt, or build upon it
+
+Full licence text: https://creativecommons.org/licenses/by-nd/4.0/
+
+### To Request Permission
+For licensing, collaboration, or commercial use enquiries:
+- 📧 Email: [email protected]
+- 📱 Phone: +91 8881555255
+- 🆔 ORCID: 0009-0007-4971-8936
+
+> *Any unauthorised use, reproduction, or misappropriation of this framework will constitute an infringement of intellectual property rights and may be subject to legal action under applicable Indian and international law.*
 
 ---
 
